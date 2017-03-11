@@ -8,16 +8,14 @@ using UnityEngine.UI;
 
 public class run : MonoBehaviour {
 
-	// Use this for initialization
 	void Start () {
 	}
 
-	// Update is called once per frame
-	void Update () {
-
-	}
-
 	public List<int> newEdge = new List<int> ();
+
+	public int currentPlayer;
+	public int isPlayerOneAI;
+	public bool firstMoves = true;
 
 	public Material material;
 	//public LineRenderer l1;
@@ -36,17 +34,55 @@ public class run : MonoBehaviour {
 		Vector3 point1 = new Vector3 (x1, y1, 1);
 		Vector3 point2 = new Vector3 (x2, y2, 1);
 		//LineRenderer l1 = gameObject.AddComponent<LineRenderer>();
-		l1.startWidth = 1;
-		l1.endWidth = 1;
+		l1.startWidth = 3;
+		l1.endWidth = 3;
 		l1.numPositions = 2;
 		l1.useWorldSpace = true;
 		l1.material = material;
 		Color bl = Color.black;
-		l1.startColor = bl;
-		l1.endColor = bl;
+		Color rd = Color.red;
+		if (currentPlayer == 1) {
+			l1.startColor = bl;
+			l1.endColor = bl;
+		} else {
+			l1.startColor = rd;
+			l1.endColor = rd;
+		}
 		l1.SetPosition (0, point1);
 		l1.SetPosition (1, point2);
 		temp.layer = 0;
+		changeTurn ();
+	}
+
+	public void debug(string t){
+		this.gameObject.transform.Find ("Debugger").GetComponentInChildren<Text> ().text = t;
+	}
+
+	public void choosePlayer(int i){
+		isPlayerOneAI = i;
+		currentPlayer = 1;
+		if (isPlayerOneAI == 0) {
+			debug ("AI is player one");
+			AI ();
+		} else {
+			debug ("AI is player two. Your turn.");
+		}
+		this.gameObject.transform.Find ("ChoosePlayer").gameObject.SetActive (false);
+	}
+
+	public int AI(){
+		if (firstMoves == true) {
+			System.Random rnd = new System.Random ();
+			int r1 = rnd.Next (1, 6);
+			int r2 = rnd.Next (1, 6);
+			Debug.Log (r1);
+			Debug.Log (r2);
+			MakeLine (r1, r2);
+		}
+		else {
+			
+		}
+		return 0;
 	}
 
 	public void click1(Button temp){
@@ -60,6 +96,31 @@ public class run : MonoBehaviour {
 			Debug.Log ("(" + newEdge [0] + ", " + newEdge[1] + ")");
 			MakeLine (newEdge [0], newEdge [1]);
 			newEdge.Clear ();
+		}
+	}
+
+	public void changeTurn(){
+		if (currentPlayer == 1) {
+			currentPlayer = 2;
+			Debug.Log ("Changed player to 2");
+			Debug.Log ("currentPlayer " + currentPlayer);
+			Debug.Log ("isPlayerOneAI " + isPlayerOneAI);
+			if (isPlayerOneAI == 0)
+				debug ("Your turn.");
+			else {
+				debug ("AI's turn.");
+				AI ();
+			}
+		} else if(currentPlayer == 2){
+			currentPlayer = 1;
+			Debug.Log ("Changed player to 1");
+			Debug.Log ("currentPlayer " + currentPlayer);
+			Debug.Log ("isPlayerOneAI " + isPlayerOneAI);
+			if (isPlayerOneAI == 0) {
+				debug ("AI's turn.");
+				AI ();
+			}else
+				debug ("Your turn.");
 		}
 	}
 

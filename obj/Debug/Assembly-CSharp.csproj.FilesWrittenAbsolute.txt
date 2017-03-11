@@ -1,3 +1,7 @@
+/Users/Fadi/Desktop/HexGame/Temp/bin/Debug/Assembly-CSharp.dll.mdb
+/Users/Fadi/Desktop/HexGame/Temp/bin/Debug/Assembly-CSharp.dll
+/Users/Fadi/Desktop/HexGame/obj/Debug/Assembly-CSharp.dll
+/Users/Fadi/Desktop/HexGame/obj/Debug/Assembly-CSharp.dll.mdb
 /Users/Fadi/Desktop/HexGame/Temp/bin/Debug/UnityEngine.dll
 /Users/Fadi/Desktop/HexGame/Temp/bin/Debug/UnityEditor.dll
 /Users/Fadi/Desktop/HexGame/Temp/bin/Debug/UnityEngine.UI.dll
@@ -15,7 +19,3 @@
 /Users/Fadi/Desktop/HexGame/Temp/bin/Debug/Unity.CecilTools.dll
 /Users/Fadi/Desktop/HexGame/Temp/bin/Debug/Mono.Cecil.Pdb.dll
 /Users/Fadi/Desktop/HexGame/Temp/bin/Debug/Mono.Cecil.Mdb.dll
-/Users/Fadi/Desktop/HexGame/Temp/bin/Debug/Assembly-CSharp.dll.mdb
-/Users/Fadi/Desktop/HexGame/Temp/bin/Debug/Assembly-CSharp.dll
-/Users/Fadi/Desktop/HexGame/obj/Debug/Assembly-CSharp.dll
-/Users/Fadi/Desktop/HexGame/obj/Debug/Assembly-CSharp.dll.mdb
