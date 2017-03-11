@@ -188,7 +188,7 @@ public class run : MonoBehaviour {
 			//Add edge to list of all edges
 			allEdges.Add(newEdge);
 
-			Console.WriteLine("Added edge to vertex: (" + i.x + ", " + i.y + ")");
+			Debug.Log("Added edge to vertex: (" + i.x + ", " + i.y + ")");
 		}
 
 		public void addVertex(int i){
@@ -199,39 +199,39 @@ public class run : MonoBehaviour {
 			//Add vertex to list of all vertices
 			vertices.Add(newVertex);
 
-			Console.WriteLine("Added vertex: " + i);
+			Debug.Log("Added vertex: " + i);
 		}
 
 		public void printEdges(){
 			int count = 0;
 			foreach(Edge item in allEdges){
-				Console.Write ("(" + item.x + ", " + item.y + ")");
+				Debug.Log ("(" + item.x + ", " + item.y + ")");
 				count++;
 			}
 		}
 		public int checkIfEdgeExists(Edge ed){
 			foreach (Edge item in allEdges) {
-				Console.WriteLine ("Edge: " + item.x + ", " + item.y);
+				Debug.Log ("Edge: " + item.x + ", " + item.y);
 				if ((item.x == ed.x && item.y == ed.y) || (item.x == ed.y && item.y == ed.x)) {
-					Console.WriteLine ("Edge already exists! Make another move");
+					Debug.Log ("Edge already exists! Make another move");
 					return 0;
 				}
 			}
-			Console.WriteLine ("Edge does not exist.");
+			Debug.Log ("Edge does not exist.");
 			return 1;
 		}
 		public void printEdges(int player){
 			int count = 0;
 			if (player == 1) {
-				Console.Write ("Player 1: ");
+				Debug.Log ("Player 1: ");
 				foreach (Edge item in HumanPlayer) {
-					Console.Write ("(" + item.x + ", " + item.y + ")");
+					Debug.Log ("(" + item.x + ", " + item.y + ")");
 					count++;
 				}
 			} else if (player == 2) {
-				Console.Write ("Player 2: ");
+				Debug.Log ("Player 2: ");
 				foreach (Edge item in AIPlayer) {
-					Console.Write ("(" + item.x + ", " + item.y + ")");
+					Debug.Log ("(" + item.x + ", " + item.y + ")");
 					count++;
 				}
 			}
