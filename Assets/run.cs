@@ -8,17 +8,25 @@ using UnityEngine.UI;
 
 public class run : MonoBehaviour {
 
-	void Start () {
-	}
+	public int currentPlayer;
+	public int AIPlayer;
+	public List<Vertex> vertices;
+	public List<Edge> allPossibleMoves;
+	public List<Edge> allEdges;
+	public List<Edge> HumanPlayer;
+	public List<Edge> AIPlayerEdges;
+	Hexagon p = new Hexagon (6);
+
+	public Material material;
 
 	public List<int> newEdge = new List<int> ();
 
-	public int currentPlayer;
 	public int isPlayerOneAI;
 	public bool firstMoves = true;
 
-	public Material material;
-	//public LineRenderer l1;
+	void Start () {
+	}
+
 	public void MakeLine(int i, int j){
 		GameObject temp = new GameObject ();
 		temp.AddComponent<LineRenderer>();
@@ -27,24 +35,21 @@ public class run : MonoBehaviour {
 		float x1 = this.transform.Find ("Points").FindChild (i.ToString ()).transform.position.x;
 		Debug.Log (x1);
 		float y1 = this.transform.Find ("Points").FindChild (i.ToString ()).transform.position.y;
-		//float z1 = this.transform.Find ("Points").FindChild (i.ToString ()).transform.position.z;
 		float x2 = this.transform.Find ("Points").FindChild (j.ToString ()).transform.position.x;
 		float y2 = this.transform.Find ("Points").FindChild (j.ToString ()).transform.position.y;
-		//float z2 = this.transform.Find ("Points").FindChild (j.ToString ()).transform.position.z;
 		Vector3 point1 = new Vector3 (x1, y1, 1);
 		Vector3 point2 = new Vector3 (x2, y2, 1);
-		//LineRenderer l1 = gameObject.AddComponent<LineRenderer>();
 		l1.startWidth = 3;
 		l1.endWidth = 3;
 		l1.numPositions = 2;
 		l1.useWorldSpace = true;
 		l1.material = material;
 		Color bl = Color.black;
-		Color rd = Color.red;
+		Color rd = Color.blue;
 		if (currentPlayer == 1) {
 			l1.startColor = bl;
 			l1.endColor = bl;
-		} else {
+		} else if(currentPlayer == 2){
 			l1.startColor = rd;
 			l1.endColor = rd;
 		}
@@ -68,6 +73,23 @@ public class run : MonoBehaviour {
 			debug ("AI is player two. Your turn.");
 		}
 		this.gameObject.transform.Find ("ChoosePlayer").gameObject.SetActive (false);
+
+		//MAIN
+		bool gameFinished = false;
+		for (int j = 1; j < 7; j++) {
+			p.addVertex (j);
+		}
+		Edge ed = new Edge (0, 1, 1);
+		p.addEdge (ed, 1);
+		p.checkIfEdgeExists (ed);
+
+		while(!gameFinished)
+		{
+			//HumanPlayerMove();
+			//switch currentPlayer;
+			AIPlayerMove();
+		}
+		//p.printEdges ();
 	}
 
 	public int AI(){
@@ -124,10 +146,6 @@ public class run : MonoBehaviour {
 		}
 	}
 
-	public class Globals{ 
-		public int currentPlayer;
-	}
-
 	public class Edge{
 		public int x;
 		public int y;
@@ -152,25 +170,15 @@ public class run : MonoBehaviour {
 		//Instantiate lists
 		List<Vertex> vertices;
 		List<Edge> allEdges;
-		List<Edge> player1;
-		List<Edge> player2;
+		List<Edge> HumanPlayer;
+		List<Edge> AIPlayer;
 
 		public Hexagon(int v){
 			//Create new lists to keep track of edges
 			vertices = new List<Vertex>();
 			allEdges = new List<Edge>();
-			player1 = new List<Edge>();
-			player2 = new List<Edge>();
-		}
-
-		public void changePlayer(Globals global){
-			if (global.currentPlayer == 1) {
-				global.currentPlayer = 2;
-				Debug.Log ("Player changed to 2");
-			} else {
-				global.currentPlayer = 1;
-				Debug.Log ("Player changed to 1");
-			}
+			HumanPlayer = new List<Edge>();
+			AIPlayer = new List<Edge>();
 		}
 
 		public void addEdge(Edge i, int player){
@@ -180,14 +188,14 @@ public class run : MonoBehaviour {
 
 			//Add edge to corresponding list
 			if (player == 1)
-				player1.Add (newEdge);
+				HumanPlayer.Add (newEdge);
 			else if (player == 2)
-				player2.Add (newEdge);
+				AIPlayer.Add (newEdge);
 
 			//Add edge to list of all edges
 			allEdges.Add(newEdge);
 
-			Debug.Log("Added edge to vertex: (" + i.x + ", " + i.y + ")");
+			Console.WriteLine("Added edge to vertex: (" + i.x + ", " + i.y + ")");
 		}
 
 		public void addVertex(int i){
@@ -198,43 +206,226 @@ public class run : MonoBehaviour {
 			//Add vertex to list of all vertices
 			vertices.Add(newVertex);
 
-			Debug.Log("Added vertex: " + i);
+			Console.WriteLine("Added vertex: " + i);
 		}
 
 		public void printEdges(){
 			int count = 0;
 			foreach(Edge item in allEdges){
-				Debug.Log ("(" + item.x + ", " + item.y + ")");
+				Console.Write ("(" + item.x + ", " + item.y + ")");
 				count++;
 			}
 		}
 		public int checkIfEdgeExists(Edge ed){
 			foreach (Edge item in allEdges) {
-				Debug.Log ("Edge: " + item.x + ", " + item.y);
+				Console.WriteLine ("Edge: " + item.x + ", " + item.y);
 				if ((item.x == ed.x && item.y == ed.y) || (item.x == ed.y && item.y == ed.x)) {
-					Debug.Log ("Edge already exists! Make another move");
+					Console.WriteLine ("Edge already exists! Make another move");
 					return 0;
 				}
 			}
-			Debug.Log ("Edge does not exist.");
+			Console.WriteLine ("Edge does not exist.");
 			return 1;
 		}
 		public void printEdges(int player){
 			int count = 0;
 			if (player == 1) {
-				Debug.Log ("Player 1: ");
-				foreach (Edge item in player1) {
-					Debug.Log ("(" + item.x + ", " + item.y + ")");
+				Console.Write ("Player 1: ");
+				foreach (Edge item in HumanPlayer) {
+					Console.Write ("(" + item.x + ", " + item.y + ")");
 					count++;
 				}
 			} else if (player == 2) {
-				Debug.Log ("Player 2: ");
-				foreach (Edge item in player2) {
-					Debug.Log ("(" + item.x + ", " + item.y + ")");
+				Console.Write ("Player 2: ");
+				foreach (Edge item in AIPlayer) {
+					Console.Write ("(" + item.x + ", " + item.y + ")");
 					count++;
+				}
+			}
+		}
+
+		// if the current list of edges means we lose, returns true
+		public bool checkIfLoss(){
+
+			// check each edge we have made
+			foreach (Edge item in AIPlayer)
+			{
+				foreach (Edge item2 in AIPlayer)
+				{
+					if (item2 != item && item.y == item2.x)
+					{
+						foreach(Edge item3 in AIPlayer)
+						{
+							if(item3 != item2 && item3 != item && item2.y == item3.x)
+							{
+								if (item3.y == item.x)
+								{
+									return true;
+								}
+							}
+						}
+					}
+				}
+
+			}
+
+			return false;
+
+		}
+	}
+
+	// AI makes a move, determining the best possible choice
+	public void AIPlayerMove(){
+		int firstNode = 0;
+		int secondNode = 0;
+		int count = 0;
+
+		//ensures that the AI is supposed to move now
+		if(currentPlayer == AIPlayer)
+		{
+			// checks every vertex possible
+			foreach (Vertex vertex in vertices)
+			{
+				//checks all edges that have already been made
+				foreach (Edge edgeItem in allEdges)
+				{
+					// checks if the current vertex has been used already
+					if (vertex.i == edgeItem.x || vertex.i == edgeItem.y)
+					{
+						count++;
+					}
+
+				}
+
+
+				if (count == 0)
+				{
+					if (firstNode == 0)
+					{
+						firstNode = vertex.i;
+					}
+					else
+						secondNode = vertex.i;
+
+				}
+
+				// if both vertices have not been used already, it is an optimal move
+				if(firstNode != 0 && secondNode != 0)
+				{
+					//make move with firstNode and secondNode
+					Edge edgeMove = new Edge(firstNode, secondNode, AIPlayer);
+					allEdges.Add(edgeMove);
+					AIPlayerEdges.Add(edgeMove);
+				}
+
+				//if we find one vertex that has been used, we make do with the open vertex
+				else if (firstNode != 0 || secondNode == 0 )
+				{
+					//choose a vertex we already picked, using lookahead function
+					CalculateMove(firstNode);
+				}
+
+				// if no vertex is free, make a move with what has already been made
+				else if (firstNode == 0 && secondNode == 0)
+				{
+					//use lookahead function, find optimal move with all possible moves to make
+					CalculateMove();
+				}
+			}
+		}
+
+	}
+
+	// predicts possible moves to make using a specific edge given by CalculateMove()
+	public bool checkMoveLookahead(Edge possibleMove){   
+		// check each move we already made
+		foreach(Edge item in AIPlayerEdges)
+		{
+			foreach(Edge item2 in AIPlayerEdges)
+			{
+				if(item2 != item)
+				{
+					// if these edges connect, we would lose
+					if(item.y == item2.x && item2.y == possibleMove.x && possibleMove.y == item.x)
+					{
+						return true;
+					}
+					// checks the opposite case
+					else if (item.x == item2.y && item2.x == possibleMove.y && possibleMove.x == item.y)
+					{
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
+	}
+
+
+	//uses lookahead function to determine if this is a good move to make
+	public void CalculateMove(int nodeOne){
+		//at end, will contain all legal moves
+		List<Edge> possibleMoves = new List<Edge>();
+		int count = 0; // determines if the edge has been made already
+
+		//check all vertices in the game and makes predictive moves
+		foreach (Vertex vertex in vertices)
+		{
+			//checks if move has been made already
+			Edge possibleMove1 = new Edge(nodeOne, vertex.i, AIPlayer);
+			Edge possibleMove2 = new Edge(vertex.i, nodeOne, AIPlayer);
+			foreach (Edge item in AIPlayerEdges)
+			{
+				if (possibleMove1 == item || possibleMove2 == item)
+				{
+					count++;
+				}
+			}
+
+			//if new move, check if it is legal
+			if (count == 0)
+			{
+				//if possible Move makes us lose, ignore it
+				if (!checkMoveLookahead(possibleMove1))
+				{
+					possibleMoves.Add(possibleMove1);
 				}
 			}
 		}
 	}
 		
+	public void CalculateMove(){
+		//at end, will contain all legal moves
+		List<Edge> possibleMoves = new List<Edge>();
+		int count = 0; // determines if the edge has been made already
+
+		//check all vertices in the game and makes predictive moves
+		foreach (Vertex vertex1 in vertices)
+		{
+			foreach (Vertex vertex2 in vertices)
+			{
+				//checks if move has been made already
+				Edge possibleMove1 = new Edge(vertex1.i, vertex2.i, AIPlayer);
+				Edge possibleMove2 = new Edge(vertex2.i, vertex1.i, AIPlayer);
+				foreach (Edge item in AIPlayerEdges)
+				{
+					if (possibleMove1 == item || possibleMove2 == item)
+					{
+						count++;
+					}
+				}
+
+				//if new move, check if it is legal
+				if (count == 0)
+				{
+					//if possible Move makes us lose, ignore it
+					if (!checkMoveLookahead(possibleMove1))
+					{
+						possibleMoves.Add(possibleMove1);
+					}
+				}
+			}
+		}
+	}
 }
