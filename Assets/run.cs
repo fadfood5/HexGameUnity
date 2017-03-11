@@ -83,16 +83,13 @@ public class run : MonoBehaviour {
 		p.addEdge (ed, 1);
 		p.checkIfEdgeExists (ed);
 
-		while(!gameFinished)
-		{
-			//HumanPlayerMove();
-			//switch currentPlayer;
-			AIPlayerMove();
-		}
+		//HumanPlayerMove();
+		//switch currentPlayer;
+		AIPlayerMove();
 		//p.printEdges ();
 	}
 
-	public int AI(){
+	public void AI(){
 		if (firstMoves == true) {
 			System.Random rnd = new System.Random ();
 			int r1 = rnd.Next (1, 6);
@@ -101,10 +98,6 @@ public class run : MonoBehaviour {
 			Debug.Log (r2);
 			MakeLine (r1, r2);
 		}
-		else {
-			
-		}
-		return 0;
 	}
 
 	public void click1(Button temp){
