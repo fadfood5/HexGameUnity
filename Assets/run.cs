@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class run : MonoBehaviour {
-
+    public bool gameFinished = false;
 	public int currentPlayer;
 	public int AIPlayer;
 	public List<Vertex> vertices;
@@ -75,7 +75,6 @@ public class run : MonoBehaviour {
 		this.gameObject.transform.Find ("ChoosePlayer").gameObject.SetActive (false);
 
 		//MAIN
-		bool gameFinished = false;
 		for (int j = 1; j < 7; j++) {
 			p.addVertex (j);
 		}
@@ -83,27 +82,79 @@ public class run : MonoBehaviour {
 		p.addEdge (ed, 1);
 		p.checkIfEdgeExists (ed);
 
-		while(!gameFinished)
-		{
-			//HumanPlayerMove();
-			//switch currentPlayer;
-			AIPlayerMove();
-		}
-		//p.printEdges ();
 	}
 
 	public int AI(){
-		if (firstMoves == true) {
+        if (currentPlayer == 1 || AIPlayer == 2)
+        {
+            if (firstMoves == true) {
 			System.Random rnd = new System.Random ();
 			int r1 = rnd.Next (1, 6);
 			int r2 = rnd.Next (1, 6);
 			Debug.Log (r1);
 			Debug.Log (r2);
 			MakeLine (r1, r2);
-		}
-		else {
-			
-		}
+
+            }
+		    else {
+            int firstNode = 0;
+            int secondNode = 0;
+            int count = 0;
+
+            //ensures that the AI is supposed to move now
+
+                // checks every vertex possible
+                foreach (Vertex vertex in vertices)
+                {
+                    //checks all edges that have already been made
+                    foreach (Edge edgeItem in allEdges)
+                    {
+                        // checks if the current vertex has been used already
+                        if (vertex.i == edgeItem.x || vertex.i == edgeItem.y)
+                        {
+                            count++;
+                        }
+
+                    }
+
+
+                    if (count == 0)
+                    {
+                        if (firstNode == 0)
+                        {
+                            firstNode = vertex.i;
+                        }
+                        else
+                            secondNode = vertex.i;
+
+                    }
+
+                    // if both vertices have not been used already, it is an optimal move
+                    if (firstNode != 0 && secondNode != 0)
+                    {
+                        //make move with firstNode and secondNode
+                        Edge edgeMove = new Edge(firstNode, secondNode, AIPlayer);
+                        allEdges.Add(edgeMove);
+                        AIPlayerEdges.Add(edgeMove);
+                        MakeLine(firstNode, secondNode);
+                    }
+
+                    //if we find one vertex that has been used, we make do with the open vertex
+                    else if (firstNode != 0 || secondNode == 0)
+                    {
+                        //choose a vertex we already picked, using lookahead function
+                        CalculateMove(firstNode);
+                    }
+
+                    // if no vertex is free, make a move with what has already been made
+                    else if (firstNode == 0 && secondNode == 0)
+                    {
+                        //use lookahead function, find optimal move with all possible moves to make
+                        CalculateMove();
+                    }
+                }
+            }
+        }
 		return 0;
 	}
 
@@ -275,66 +326,19 @@ public class run : MonoBehaviour {
 	}
 
 	// AI makes a move, determining the best possible choice
-	public void AIPlayerMove(){
-		int firstNode = 0;
-		int secondNode = 0;
-		int count = 0;
+	public bool legalMove(Edge check)
+    {
+        Edge check2 = new Edge(check.y, check.x, AIPlayer);
+        foreach(Edge item in allEdges)
+        {
+            if ((check.x == item.x && check.y == item.y) || (check2.x == item.x && check2.y == item.y))
+            {
+                return false;
+            }
+        }
 
-		//ensures that the AI is supposed to move now
-		if(currentPlayer == AIPlayer)
-		{
-			// checks every vertex possible
-			foreach (Vertex vertex in vertices)
-			{
-				//checks all edges that have already been made
-				foreach (Edge edgeItem in allEdges)
-				{
-					// checks if the current vertex has been used already
-					if (vertex.i == edgeItem.x || vertex.i == edgeItem.y)
-					{
-						count++;
-					}
-
-				}
-
-
-				if (count == 0)
-				{
-					if (firstNode == 0)
-					{
-						firstNode = vertex.i;
-					}
-					else
-						secondNode = vertex.i;
-
-				}
-
-				// if both vertices have not been used already, it is an optimal move
-				if(firstNode != 0 && secondNode != 0)
-				{
-					//make move with firstNode and secondNode
-					Edge edgeMove = new Edge(firstNode, secondNode, AIPlayer);
-					allEdges.Add(edgeMove);
-					AIPlayerEdges.Add(edgeMove);
-				}
-
-				//if we find one vertex that has been used, we make do with the open vertex
-				else if (firstNode != 0 || secondNode == 0 )
-				{
-					//choose a vertex we already picked, using lookahead function
-					CalculateMove(firstNode);
-				}
-
-				// if no vertex is free, make a move with what has already been made
-				else if (firstNode == 0 && secondNode == 0)
-				{
-					//use lookahead function, find optimal move with all possible moves to make
-					CalculateMove();
-				}
-			}
-		}
-
-	}
+        return true;
+    }
 
 	// predicts possible moves to make using a specific edge given by CalculateMove()
 	public bool checkMoveLookahead(Edge possibleMove){   
@@ -367,7 +371,7 @@ public class run : MonoBehaviour {
 	public void CalculateMove(int nodeOne){
 		//at end, will contain all legal moves
 		List<Edge> possibleMoves = new List<Edge>();
-		int count = 0; // determines if the edge has been made already
+//		int count = 0; // determines if the edge has been made already
 
 		//check all vertices in the game and makes predictive moves
 		foreach (Vertex vertex in vertices)
@@ -375,16 +379,16 @@ public class run : MonoBehaviour {
 			//checks if move has been made already
 			Edge possibleMove1 = new Edge(nodeOne, vertex.i, AIPlayer);
 			Edge possibleMove2 = new Edge(vertex.i, nodeOne, AIPlayer);
-			foreach (Edge item in AIPlayerEdges)
+/*			foreach (Edge item in AIPlayerEdges)
 			{
 				if (possibleMove1 == item || possibleMove2 == item)
 				{
 					count++;
 				}
 			}
-
+*/
 			//if new move, check if it is legal
-			if (count == 0)
+			if (legalMove(possibleMove1) || legalMove(possibleMove2))
 			{
 				//if possible Move makes us lose, ignore it
 				if (!checkMoveLookahead(possibleMove1))
