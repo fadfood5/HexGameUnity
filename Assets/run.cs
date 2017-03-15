@@ -237,7 +237,7 @@ public class run : MonoBehaviour {
             if (comparison == true) // if edge exists, have human player restart turn
             {
                 newEdge.Clear();
-				debug("Edge already exists. Try another move.");
+//				debug("Edge already exists. Try another move.");
             }
 
             else
@@ -347,6 +347,11 @@ public class run : MonoBehaviour {
 		}
 		public bool checkIfEdgeExists(Edge ed){
             Debug.Log(allEdges.Count);
+            if(ed.x == ed.y)
+            {
+                Debug.Log("Cannot use same vertex to make an edge. Make another move.");
+                return true;
+            }
 			foreach (Edge item in allEdges) {
 				Debug.Log ("Edge: " + item.x + ", " + item.y);
 				if ((item.x == ed.x && item.y == ed.y) || (item.x == ed.y && item.y == ed.x)) {
@@ -441,19 +446,28 @@ public class run : MonoBehaviour {
 		// check each move we already made
 		foreach(Edge item in p.AIPlayerEdges)
 		{
+
 			foreach(Edge item2 in p.AIPlayerEdges)
 			{
-				if(item2 != item)
+
+				if(item2 != item && (item.x == item2.x || item.y == item2.y || item.x == item2.y || item.y == item2.x))
 				{
-					// if these edges connect, we would lose
-					if(item.y == item2.x && item2.y == possibleMove.x && possibleMove.y == item.x)
-					{
-						return true;
-					}
-					// checks the opposite case
-					else if (item.x == item2.y && item2.x == possibleMove.y && possibleMove.x == item.y)
-					{
-						return true;
+
+                    // if these edges connect, we would lose
+                    if (possibleMove != item2 && possibleMove != item && (item2.x == possibleMove.x || item2.x == possibleMove.y 
+                        || item2.y == possibleMove.x || item2.y == possibleMove.y))
+                    {
+
+                        if (possibleMove.x == item.x || possibleMove.x == item.y || possibleMove.y == item.x || possibleMove.y == item.y)
+                        {
+
+                            if (((possibleMove.x != item.x && possibleMove.x != item.y) && (possibleMove.x != item2.x && possibleMove.x != item2.y)) ||
+                                       (possibleMove.y != item.x && possibleMove.y != item.y && possibleMove.y != item2.x && possibleMove.y != item2.y))
+                            { }
+
+                            else
+                            { return true; }
+                        }
 					}
 				}
 			}
@@ -485,6 +499,11 @@ public class run : MonoBehaviour {
 				{
 					possibleMoves.Add(possibleMove1);
 				}
+
+                else
+                {
+                    Debug.Log("(" + possibleMove1.x + ", " + possibleMove1.y + ") would make us lose. Ignore.");
+                }
 			}
 		}
 
@@ -522,6 +541,11 @@ public class run : MonoBehaviour {
                             if (!checkMoveLookahead(possibleMove1))
                             {
                                 possibleMoves.Add(possibleMove1);
+                            }
+
+                            else
+                            {
+                                Debug.Log("(" + possibleMove1.x + ", " + possibleMove1.y + ") would make us lose. Ignore.");
                             }
                         }
                     }
