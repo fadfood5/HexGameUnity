@@ -103,6 +103,7 @@ public class run : MonoBehaviour {
 	public int AI(){
 //        Debug.Log(currentPlayer);
           Debug.Log("AI Turn.");
+		this.gameObject.transform.Find ("Buttons").gameObject.SetActive (false);
         if (currentPlayer == AIPlayer || AIPlayer == 2)
         {
             if (firstMoves == true)
@@ -219,16 +220,15 @@ public class run : MonoBehaviour {
                 }
              
         }
-        Debug.Log("Your turn.");
+		Debug.Log("Your turn.");
+		this.gameObject.transform.Find ("Buttons").gameObject.SetActive (true);
 		return 0;
 	}
 
 	public void click1(Button temp){
 		int num = Int32.Parse (temp.transform.Find ("Text").GetComponent<Text> ().text);
-//		Debug.Log ("click1");
 		if (newEdge.Count == 0) {
 			newEdge.Add(num);
-			//Debug.Log ("(" + newEdge [0] + ", )");
 		} else {
 			newEdge.Add(num);
 //			Debug.Log ("(" + newEdge [0] + ", " + newEdge[1] + ")");
@@ -236,13 +236,12 @@ public class run : MonoBehaviour {
             bool comparison = p.checkIfEdgeExists(edgeCheck);
             if (comparison == true) // if edge exists, have human player restart turn
             {
- //               Debug.Log("Edge exists.");
                 newEdge.Clear();
+				debug("Edge already exists. Try another move.");
             }
 
             else
             {
-//                Debug.Log("Edge added.");
                 p.HumanPlayer.Add(edgeCheck);
                 p.allEdges.Add(edgeCheck); 
                 MakeLine(newEdge[0], newEdge[1]);
@@ -349,13 +348,13 @@ public class run : MonoBehaviour {
 		public bool checkIfEdgeExists(Edge ed){
             Debug.Log(allEdges.Count);
 			foreach (Edge item in allEdges) {
-		//		Debug.Log ("Edge: " + item.x + ", " + item.y);
+				Debug.Log ("Edge: " + item.x + ", " + item.y);
 				if ((item.x == ed.x && item.y == ed.y) || (item.x == ed.y && item.y == ed.x)) {
 					Debug.Log ("Edge already exists! Make another move");
 					return true;
 				}
 			}
-//			Debug.Log ("Edge does not exist.");
+			Debug.Log ("Edge does not exist.");
 			return false;
 		}
 		public void printEdges(int player){
