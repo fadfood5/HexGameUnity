@@ -79,6 +79,7 @@ public class run : MonoBehaviour {
 		this.gameObject.transform.Find ("Debugger").GetComponentInChildren<Text> ().text = t;
 	}
 
+    
     //Game Start Point
 	public void choosePlayer(int i){
 		isPlayerOneAI = i;
@@ -109,7 +110,7 @@ public class run : MonoBehaviour {
 //        Debug.Log(currentPlayer);
           Debug.Log("AI Turn.");
 		this.gameObject.transform.Find ("Buttons").gameObject.SetActive (false);
-        if (currentPlayer == AIPlayer || AIPlayer == 2)
+        if (currentPlayer == AIPlayer)
         {
             if (firstMoves == true)
             {
@@ -386,7 +387,7 @@ public class run : MonoBehaviour {
 
 		// if the current list of edges means we lose, returns true
 		public bool checkIfLoss(){
-            List<Edge> checkEdges;
+ //           List<Edge> checkEdges;
 
 			// check each edge we have made
 			foreach (Edge item in allEdges)
@@ -411,10 +412,10 @@ public class run : MonoBehaviour {
 
                                     else
                                     {
-
-                                        Debug.Log("(" + item.x + ", " + item.y + ")");
-                                        Debug.Log("(" + item2.x + ", " + item2.y + ")");
-                                        Debug.Log("(" + item3.x + ", " + item3.y + ")");
+                                        Debug.Log("Current player: ");
+                                        Debug.Log("(" + item.x + ", " + item.y + ", " + item.z + ")");
+                                        Debug.Log("(" + item2.x + ", " + item2.y + ", " + item.z + ")");
+                                        Debug.Log("(" + item3.x + ", " + item3.y + ", " + item.z + ")");
                                         return true;
                                     }
 								}
@@ -466,9 +467,9 @@ public class run : MonoBehaviour {
     // predicts possible moves to make using a specific edge given by CalculateMove()
     public bool checkMoveLookahead(Edge possibleMove, int player){
         List<Edge> edgeChecker = new List<Edge>();
-        if (player == 1)
+        if (player == AIPlayer)
             edgeChecker = p.AIPlayerEdges;
-        else if (player == 2)
+        else if (player == HumanPlayer)
             edgeChecker = p.HumanPlayer;
 
 
@@ -505,9 +506,46 @@ public class run : MonoBehaviour {
 		return false;
 	}
 
+    public bool predictioncheckMoveLookahead(List<Edge> domain, Edge possibleMove, int player)
+    {
 
-	//uses lookahead function to determine if this is a good move to make
-	public void CalculateMove(int nodeOne){
+
+        // check each move we already made
+        foreach (Edge item in domain)
+        {
+
+            foreach (Edge item2 in domain)
+            {
+
+                if (item2 != item && (item.x == item2.x || item.y == item2.y || item.x == item2.y || item.y == item2.x))
+                {
+
+                    // if these edges connect, we would lose
+                    if (possibleMove != item2 && possibleMove != item && (item2.x == possibleMove.x || item2.x == possibleMove.y
+                        || item2.y == possibleMove.x || item2.y == possibleMove.y))
+                    {
+
+                        if (possibleMove.x == item.x || possibleMove.x == item.y || possibleMove.y == item.x || possibleMove.y == item.y)
+                        {
+
+                            if (((possibleMove.x != item.x && possibleMove.x != item.y) && (possibleMove.x != item2.x && possibleMove.x != item2.y)) ||
+                                       (possibleMove.y != item.x && possibleMove.y != item.y && possibleMove.y != item2.x && possibleMove.y != item2.y))
+                            { }
+
+                            else
+                            { return true; }
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+
+    //uses lookahead function to determine if this is a good move to make
+    public void CalculateMove(int nodeOne){
         //at end, will contain all legal moves
         Debug.Log("Initiate oneNode calculation");
         List<Edge> possibleMoves = new List<Edge>();
@@ -537,9 +575,10 @@ public class run : MonoBehaviour {
 		}
 
         Edge useMove = possibleMoves.First();
-        MakeLine(useMove.x, useMove.y);
         p.AIPlayerEdges.Add(useMove);
         p.allEdges.Add(useMove);
+        MakeLine(useMove.x, useMove.y);
+
         Debug.Log("AI Edge: (" + useMove.x + ", " + useMove.y + ")");
  //       Debug.Log("AI Edges: " + p.AIPlayerEdges.Count);
         possibleMoves.Clear();
@@ -600,9 +639,9 @@ public class run : MonoBehaviour {
         {
             Edge useMove = possibleMoves.First();
             useMove = AILookAhead(possibleMoves);
-            MakeLine(useMove.x, useMove.y);
             p.AIPlayerEdges.Add(useMove);
             p.allEdges.Add(useMove);
+            MakeLine(useMove.x, useMove.y);
             Debug.Log("AI Edge: (" + useMove.x + ", " + useMove.y + ")");
             Debug.Log("AI Edges: " + p.AIPlayerEdges.Count);
             possibleMoves.Clear();
@@ -610,10 +649,10 @@ public class run : MonoBehaviour {
         }
     }
 
-    public Edge HumanCalculateMoves(List<Edge> moves)
+    public Edge HumanCalculateMoves(List<Edge> moves, Edge AIMove)
     {
         //at end, will contain all legal moves
-//        Debug.Log("Initiate noNode calculation.");
+        Debug.Log("HumanCalculateMoves()");
         List<Edge> possibleMoves = new List<Edge>();
         Edge useMove = new Edge(0,0,0);
         //check all vertices in the game and makes predictive moves
@@ -624,34 +663,43 @@ public class run : MonoBehaviour {
 
                 if (vertex1 != vertex2)
                 {
+                    
                     int playerTest = 0;
                     //checks if move has been made already
                     if (AIPlayer == 2)
-                        playerTest = 1;
-                    else if (AIPlayer == 1)
-                        playerTest = 2;
-                    Edge possibleMove1 = new Edge(vertex1.i, vertex2.i, playerTest);
-                    Edge possibleMove2 = new Edge(vertex2.i, vertex1.i, playerTest);
-                    foreach (Edge item in p.AIPlayerEdges)
                     {
+                        Debug.Log("AI went second.");
+                        playerTest = 1;
+                    }
+                    else if (AIPlayer == 1)
+                    {
+                        Debug.Log("AI went first.");
 
-                        if (legalMove(possibleMove1) || legalMove(possibleMove2))
-                        {
-                            //if possible Move makes us lose, ignore it
-                            if (!checkMoveLookahead(possibleMove1, playerTest))
-                            {
-                                possibleMoves.Add(possibleMove1);
-                            }
+                        playerTest = 2;
+                    }
+                    if ((vertex1.i != AIMove.x || vertex2.i != AIMove.y))
+                    {
+                        Debug.Log("PlayerTest: " + playerTest);
+                        Edge possibleMove1 = new Edge(vertex1.i, vertex2.i, playerTest);
+                        Edge possibleMove2 = new Edge(vertex2.i, vertex1.i, playerTest);
 
-                            else
+                            if (PossibleLegalMove(moves, possibleMove1) || PossibleLegalMove(moves, possibleMove2))
                             {
-                                Debug.Log("(" + possibleMove1.x + ", " + possibleMove1.y + ") would make us lose. Ignore.");
+                                //if possible Move makes us lose, ignore it
+                                if (!predictioncheckMoveLookahead(p.HumanPlayer, possibleMove1, playerTest))
+                                {
+                                    possibleMoves.Add(possibleMove1);
+                                }
+
+                                else
+                                {
+                                    Debug.Log("(" + possibleMove1.x + ", " + possibleMove1.y + ") would make us lose. Ignore.");
+                                }
                             }
                         }
                     }
 
-
-                }
+                
             }
 
         }
@@ -662,6 +710,7 @@ public class run : MonoBehaviour {
         }
         else
         {
+            Debug.Log(possibleMoves.First().x + "," + possibleMoves.First().y + "," + possibleMoves.First().z);
             useMove = possibleMoves.First();
 //            AILookAhead(possibleMoves);
             /*            MakeLine(useMove.x, useMove.y);
@@ -679,11 +728,12 @@ public class run : MonoBehaviour {
 
     }
 
-    public Edge predictionMove(List<Edge> AICurrentMoves)
+    public Edge predictionMove(List<Edge> domain, List<Edge> AICurrentMoves, Edge futureHumanMove)
     {
+        Debug.Log("PredicitionMove()");
         List<Edge> possibleMoves = new List<Edge>();
         List<Edge> failureMove = new List<Edge>();
-        Edge useMove = new Edge(0, 0, 0);
+   //     Edge useMove = new Edge(0, 0, AIPlayer);
         foreach (Vertex vertex1 in p.vertices)
         {
             foreach (Vertex vertex2 in p.vertices)
@@ -691,35 +741,30 @@ public class run : MonoBehaviour {
 
                 if (vertex1 != vertex2)
                 {
-                    int playerTest = 0;
-                    //checks if move has been made already
-                    if (AIPlayer == 2)
-                        playerTest = 1;
-                    else if (AIPlayer == 1)
-                        playerTest = 2;
-                    Edge possibleMove1 = new Edge(vertex1.i, vertex2.i, playerTest);
-                    Edge possibleMove2 = new Edge(vertex2.i, vertex1.i, playerTest);
-                    foreach (Edge item in p.AIPlayerEdges)
+                 
+                    if (vertex1.i != futureHumanMove.x || vertex2.i != futureHumanMove.y)
                     {
+                        Edge possibleMove1 = new Edge(vertex1.i, vertex2.i, AIPlayer);
+                        Edge possibleMove2 = new Edge(vertex2.i, vertex1.i, AIPlayer);
 
-                        if (PossibleLegalMove(AICurrentMoves, possibleMove1) || PossibleLegalMove(AICurrentMoves, possibleMove2))
-                        {
-                            //if possible Move makes us lose, ignore it
-                            if (!checkMoveLookahead(possibleMove1, playerTest))
+                            if (PossibleLegalMove(domain, possibleMove1) || PossibleLegalMove(domain, possibleMove2))
                             {
-                                possibleMoves.Add(possibleMove1);
-                            }
+                                //if possible Move makes us lose, ignore it
+                                if (!predictioncheckMoveLookahead(AICurrentMoves, possibleMove1, AIPlayer))
+                                {
+                                    possibleMoves.Add(possibleMove1);
+                                }
 
-                            else
-                            {
-                                Debug.Log("(" + possibleMove1.x + ", " + possibleMove1.y + ") would make us lose. Ignore.");
-                                failureMove.Add(possibleMove1);
+                                else
+                                {
+                                    Debug.Log("(" + possibleMove1.x + ", " + possibleMove1.y + ") would make us lose in the future.");
+                                    failureMove.Add(possibleMove1);
 
+                                }
                             }
-                        }
+                        
+
                     }
-
-
                 }
             }
 
@@ -732,7 +777,7 @@ public class run : MonoBehaviour {
         }
         else
         {
-            useMove = possibleMoves.First();
+//            useMove = possibleMoves.First();
             //            AILookAhead(possibleMoves);
             /*            MakeLine(useMove.x, useMove.y);
                         p.AIPlayerEdges.Add(useMove);
@@ -751,13 +796,18 @@ public class run : MonoBehaviour {
 
     public Edge AILookAhead( List<Edge> possibleMoves)
     {
+        Debug.Log("AILookAhead()");
         Edge idealMove = possibleMoves.First();
+        List<Edge> humanEdges = p.HumanPlayer.ToList();
+        List<Edge> allNewEdges = p.allEdges.ToList();
+        allNewEdges.Add(idealMove);
         Debug.Log("Possible move is: (" + idealMove.x + ", " + idealMove.y + ")");
-        Edge playerMove = HumanCalculateMoves(possibleMoves);
-        List<Edge> futureAIMoves = p.AIPlayerEdges;
-//        futureAIMoves.Add(idealMove);
+        Edge playerMove = HumanCalculateMoves(allNewEdges, idealMove);
+        List<Edge> futureAIMoves = p.AIPlayerEdges.ToList();
+        futureAIMoves.Add(idealMove);
+        allNewEdges.Add(playerMove);
 
-//        idealMove = predictionMove(futureAIMoves);
+        idealMove = predictionMove(allNewEdges, futureAIMoves, playerMove);
 
 
 
