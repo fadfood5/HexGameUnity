@@ -60,6 +60,8 @@ public class run : MonoBehaviour {
         if (p.checkIfLoss())
         {
             Debug.Log("Game is over. Player " + currentPlayer + " lost.");
+			debug("Game is over. Player " + currentPlayer + " lost.");
+			this.transform.Find ("Buttons").gameObject.SetActive (false);
             //          while(true)
             //        {
             //            Debug.Log("End.");
