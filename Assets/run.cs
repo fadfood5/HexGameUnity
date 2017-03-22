@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -33,9 +34,9 @@ public class run : MonoBehaviour {
 		GameObject temp = new GameObject ();
 		temp.AddComponent<LineRenderer>();
 		LineRenderer l1 = temp.GetComponent<LineRenderer> ();
-//		Debug.Log ("Make Line");
+//		UnityEngine.Debug.Log ("Make Line");
 		float x1 = this.transform.Find ("Points").FindChild (i.ToString ()).transform.position.x;
-//		Debug.Log (x1);
+//		UnityEngine.Debug.Log (x1);
 		float y1 = this.transform.Find ("Points").FindChild (i.ToString ()).transform.position.y;
 		float x2 = this.transform.Find ("Points").FindChild (j.ToString ()).transform.position.x;
 		float y2 = this.transform.Find ("Points").FindChild (j.ToString ()).transform.position.y;
@@ -63,12 +64,12 @@ public class run : MonoBehaviour {
         //after a line has been made, check if the player who made it lost
         if (p.checkIfLoss())
         {
-            Debug.Log("Game is over. Player " + currentPlayer + " lost.");
+            UnityEngine.Debug.Log("Game is over. Player " + currentPlayer + " lost.");
 			debug("Game is over. Player " + currentPlayer + " lost.");
 			this.transform.Find ("Buttons").gameObject.SetActive (false);
             //          while(true)
             //        {
-            //            Debug.Log("End.");
+            //            UnityEngine.Debug.Log("End.");
             //      }
         }
 
@@ -112,9 +113,10 @@ public class run : MonoBehaviour {
 
     //helper function to intialize the AI for the game
 	public int AI(){
-//        Debug.Log(currentPlayer);
-          Debug.Log("AI Turn.");
+//      UnityEngine.Debug.Log(currentPlayer);
+      	UnityEngine.Debug.Log("AI Turn.");
 		this.gameObject.transform.Find ("Buttons").gameObject.SetActive (false);
+		p.stopWatch.Start ();
         if (currentPlayer == AIPlayer)
         {
             if (firstMoves == true)
@@ -129,14 +131,14 @@ public class run : MonoBehaviour {
                     r2 = rnd.Next(1, 6);
                 }
 
-                //			Debug.Log (r1);
-                //			Debug.Log (r2);
+                //			UnityEngine.Debug.Log (r1);
+                //			UnityEngine.Debug.Log (r2);
                 Edge AIEdge = new Edge(r1, r2, AIPlayer);
                 MakeLine(r1, r2);
                 p.AIPlayerEdges.Add(AIEdge);
                 p.allEdges.Add(AIEdge);
-                Debug.Log("AI Edge: (" + r1 + ", " + r2 + ")");
-                Debug.Log("AI Edges: " + p.AIPlayerEdges.Count);
+                UnityEngine.Debug.Log("AI Edge: (" + r1 + ", " + r2 + ")");
+                UnityEngine.Debug.Log("AI Edges: " + p.AIPlayerEdges.Count);
                 firstMoves = false;
 
             }
@@ -191,14 +193,14 @@ public class run : MonoBehaviour {
                      p.allEdges.Add(edgeMove);
                      p.AIPlayerEdges.Add(edgeMove);
                      MakeLine(firstNode, secondNode);
-                     Debug.Log("AI Edge: (" + firstNode + ", " + secondNode + ")");
+                     UnityEngine.Debug.Log("AI Edge: (" + firstNode + ", " + secondNode + ")");
                   }
 
                  //if we find one vertex that has been used, we make do with the open vertex
                  else if (firstNode != 0 && secondNode == 0)
                   {
                      //choose a vertex we already picked, using lookahead function
-                     Debug.Log("Calculating move with one possible node: " + firstNode);
+                     UnityEngine.Debug.Log("Calculating move with one possible node: " + firstNode);
                      CalculateMove(firstNode);
                   }
 
@@ -206,16 +208,23 @@ public class run : MonoBehaviour {
                             else if (firstNode == 0 && secondNode == 0)
                             {
                     //use lookahead function, find optimal move with all possible moves to make
-                    Debug.Log("Calculating move, considering all possibilites");
+                    UnityEngine.Debug.Log("Calculating move, considering all possibilites");
                                 CalculateMove();
                             }
-                }
+			}
+			p.stopWatch.Stop ();
+			TimeSpan ts = p.stopWatch.Elapsed;
+			string elapsedTime = String.Format("{0:00}:{1:00}",
+				ts.Seconds,
+				ts.Milliseconds);
+			UnityEngine.Debug.Log(ts.TotalMilliseconds);
+			//UnityEngine.Debug.Log("RunTime " + elapsedTime);
              
         }
 
         p.counter1 = 0;
         p.counter2 = 0;
-		Debug.Log("Your turn.");
+		UnityEngine.Debug.Log("Your turn.");
 		this.gameObject.transform.Find ("Buttons").gameObject.SetActive (true);
 		return 0;
 	}
@@ -226,7 +235,7 @@ public class run : MonoBehaviour {
 			newEdge.Add(num);
 		} else {
 			newEdge.Add(num);
-//			Debug.Log ("(" + newEdge [0] + ", " + newEdge[1] + ")");
+//			UnityEngine.Debug.Log ("(" + newEdge [0] + ", " + newEdge[1] + ")");
             Edge edgeCheck = new global::run.Edge(newEdge[0], newEdge[1], currentPlayer);
             bool comparison = p.checkIfEdgeExists(edgeCheck);
             if (comparison == true) // if edge exists, have human player restart turn
@@ -248,9 +257,9 @@ public class run : MonoBehaviour {
 	public void changeTurn(){
 		if (currentPlayer == 1) {
 			currentPlayer = 2;
-			//Debug.Log ("Changed player to 2");
-			//Debug.Log ("currentPlayer " + currentPlayer);
-			//Debug.Log ("isPlayerOneAI " + isPlayerOneAI);
+			//UnityEngine.Debug.Log ("Changed player to 2");
+			//UnityEngine.Debug.Log ("currentPlayer " + currentPlayer);
+			//UnityEngine.Debug.Log ("isPlayerOneAI " + isPlayerOneAI);
 			if (isPlayerOneAI == 0)
 				debug ("Your turn.");
 			else {
@@ -259,9 +268,9 @@ public class run : MonoBehaviour {
 			}
 		} else if(currentPlayer == 2){
 			currentPlayer = 1;
-			//Debug.Log ("Changed player to 1");
-			//Debug.Log ("currentPlayer " + currentPlayer);
-			//Debug.Log ("isPlayerOneAI " + isPlayerOneAI);
+			//UnityEngine.Debug.Log ("Changed player to 1");
+			//UnityEngine.Debug.Log ("currentPlayer " + currentPlayer);
+			//UnityEngine.Debug.Log ("isPlayerOneAI " + isPlayerOneAI);
 			if (isPlayerOneAI == 0) {
 				debug ("AI's turn.");
 				AI ();
@@ -299,6 +308,8 @@ public class run : MonoBehaviour {
 
         public int counter1;
         public int counter2;
+
+		public Stopwatch stopWatch = new Stopwatch();
 
 
         public Hexagon(int v){
@@ -347,20 +358,20 @@ public class run : MonoBehaviour {
 			}
 		}
 		public bool checkIfEdgeExists(Edge ed){
-            Debug.Log(allEdges.Count);
+            UnityEngine.Debug.Log(allEdges.Count);
             if(ed.x == ed.y)
             {
-                Debug.Log("Cannot use same vertex to make an edge. Make another move.");
+                UnityEngine.Debug.Log("Cannot use same vertex to make an edge. Make another move.");
                 return true;
             }
 			foreach (Edge item in allEdges) {
-//				Debug.Log ("Edge: " + item.x + ", " + item.y);
+//				UnityEngine.Debug.Log ("Edge: " + item.x + ", " + item.y);
 				if ((item.x == ed.x && item.y == ed.y) || (item.x == ed.y && item.y == ed.x)) {
-					Debug.Log ("Edge already exists! Make another move");
+					UnityEngine.Debug.Log ("Edge already exists! Make another move");
 					return true;
 				}
 			}
-//			Debug.Log ("Edge does not exist.");
+//			UnityEngine.Debug.Log ("Edge does not exist.");
 			return false;
 		}
 		public void printEdges(int player){
@@ -408,10 +419,10 @@ public class run : MonoBehaviour {
 
                                     else
                                     {
-                                        Debug.Log("Current player: ");
-                                        Debug.Log("(" + item.x + ", " + item.y + ", " + item.z + ")");
-                                        Debug.Log("(" + item2.x + ", " + item2.y + ", " + item.z + ")");
-                                        Debug.Log("(" + item3.x + ", " + item3.y + ", " + item.z + ")");
+                                        UnityEngine.Debug.Log("Current player: ");
+                                        UnityEngine.Debug.Log("(" + item.x + ", " + item.y + ", " + item.z + ")");
+                                        UnityEngine.Debug.Log("(" + item2.x + ", " + item2.y + ", " + item.z + ")");
+                                        UnityEngine.Debug.Log("(" + item3.x + ", " + item3.y + ", " + item.z + ")");
                                         return true;
                                     }
 								}
@@ -554,7 +565,7 @@ public class run : MonoBehaviour {
     public void CalculateMove(int nodeOne){
 
         //at end, will contain all legal moves
-        Debug.Log("Initiate oneNode calculation");
+        UnityEngine.Debug.Log("Initiate oneNode calculation");
         List<Edge> possibleMoves = new List<Edge>();
 
 		//check all vertices in the game and makes predictive moves
@@ -583,7 +594,7 @@ public class run : MonoBehaviour {
         p.allEdges.Add(useMove);
         MakeLine(useMove.x, useMove.y);
 
-        Debug.Log("AI Edge: (" + useMove.x + ", " + useMove.y + ")");
+        UnityEngine.Debug.Log("AI Edge: (" + useMove.x + ", " + useMove.y + ")");
         possibleMoves.Clear();
     }
 		
@@ -628,11 +639,11 @@ public class run : MonoBehaviour {
 
         if (possibleMoves.Count == 0)
         {
-            Debug.Log("No moves can be made without losing.");
+            UnityEngine.Debug.Log("No moves can be made without losing.");
             p.AIPlayerEdges.Add(failureMoves.Last());
             p.allEdges.Add(failureMoves.Last());
             MakeLine(failureMoves.Last().x, failureMoves.Last().y);
-            Debug.Log("AI Edge: (" + failureMoves.Last().x + ", " + failureMoves.Last().y + ")");
+            UnityEngine.Debug.Log("AI Edge: (" + failureMoves.Last().x + ", " + failureMoves.Last().y + ")");
 
         }
         else
@@ -646,8 +657,8 @@ public class run : MonoBehaviour {
                 p.AIPlayerEdges.Add(useMove2);
                 p.allEdges.Add(useMove2);
                 MakeLine(useMove2.x, useMove2.y);
-                Debug.Log("AI Edge: (" + useMove2.x + ", " + useMove2.y + ")");
-                Debug.Log("AI Edges: " + p.AIPlayerEdges.Count);
+                UnityEngine.Debug.Log("AI Edge: (" + useMove2.x + ", " + useMove2.y + ")");
+                UnityEngine.Debug.Log("AI Edges: " + p.AIPlayerEdges.Count);
             }
 
             // if predicted move could not be found, use the ideal move found earlier
@@ -656,8 +667,8 @@ public class run : MonoBehaviour {
                 p.AIPlayerEdges.Add(useMove);
                 p.allEdges.Add(useMove);
                 MakeLine(useMove.x, useMove.y);
-                Debug.Log("AI Edge: (" + useMove.x + ", " + useMove.y + ")");
-                Debug.Log("AI Edges: " + p.AIPlayerEdges.Count);
+                UnityEngine.Debug.Log("AI Edge: (" + useMove.x + ", " + useMove.y + ")");
+                UnityEngine.Debug.Log("AI Edges: " + p.AIPlayerEdges.Count);
             }
             
             possibleMoves.Clear();
@@ -714,7 +725,7 @@ public class run : MonoBehaviour {
         }
         if (possibleMoves.Count == 0)
         {
-            Debug.Log("No moves can be made, make random.");
+            UnityEngine.Debug.Log("No moves can be made, make random.");
             return null;
 
         }
@@ -740,7 +751,7 @@ public class run : MonoBehaviour {
 
         else
         {
-            Debug.Log("PredicitionMove()");
+            UnityEngine.Debug.Log("PredicitionMove()");
             List<Edge> possibleMoves = new List<Edge>();
             List<Edge> failureMove = new List<Edge>();
 
@@ -778,10 +789,16 @@ public class run : MonoBehaviour {
 
             }
 
+
+
             if (possibleMoves.Count == 0)
             {
-                Debug.Log("No moves can be made without losing.");
-                return failureMove.Last();
+                UnityEngine.Debug.Log("No moves can be made without losing.");
+
+				if (failureMove.Count != 0)
+					return failureMove.Last ();
+				else
+					return null;
 
             }
 
@@ -794,7 +811,7 @@ public class run : MonoBehaviour {
     // driver function for making the AI predictions
     public Edge AILookAhead(List<Edge> possibleMoves)
     {
-        Debug.Log("AILookAhead()");
+        UnityEngine.Debug.Log("AILookAhead()");
         Edge idealMove = possibleMoves.First();
         Edge playerMove;
 
@@ -823,7 +840,7 @@ public class run : MonoBehaviour {
                 idealMove = predictionMove(allNewEdges, futureAIMoves, playerMove);
 
                 //number of AI predictions
-                Debug.Log(i+1 + ", " + p.counter1);
+                UnityEngine.Debug.Log(i+1 + ", " + p.counter1);
 
             }
 
