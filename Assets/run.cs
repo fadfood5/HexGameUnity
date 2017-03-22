@@ -12,11 +12,7 @@ public class run : MonoBehaviour {
 	public int currentPlayer;
 	public int AIPlayer = 0;
     public int HumanPlayer;
-/*	public List<Vertex> vertices;
-	public List<Edge> allPossibleMoves;
-	public List<Edge> allEdges = new List<Edge>();
-    public List<Edge> HumanPlayer = new List<Edge>();
-	public List<Edge> AIPlayerEdges = new List<Edge>();*/
+
 	Hexagon p = new Hexagon (6);
 
 	public Material material;
@@ -67,10 +63,7 @@ public class run : MonoBehaviour {
             UnityEngine.Debug.Log("Game is over. Player " + currentPlayer + " lost.");
 			debug("Game is over. Player " + currentPlayer + " lost.");
 			this.transform.Find ("Buttons").gameObject.SetActive (false);
-            //          while(true)
-            //        {
-            //            UnityEngine.Debug.Log("End.");
-            //      }
+
         }
 
         //if we did not lose, move to next player's turn
@@ -105,9 +98,6 @@ public class run : MonoBehaviour {
 		for (int j = 1; j < 7; j++) {
 			p.addVertex (j);
 		}
-//		Edge ed = new Edge (0, 1, 1);
-//		p.addEdge (ed, 1);
-//		p.checkIfEdgeExists (ed);
 
 	}
 
@@ -131,8 +121,6 @@ public class run : MonoBehaviour {
                     r2 = rnd.Next(1, 6);
                 }
 
-                //			UnityEngine.Debug.Log (r1);
-                //			UnityEngine.Debug.Log (r2);
                 Edge AIEdge = new Edge(r1, r2, AIPlayer);
                 MakeLine(r1, r2);
                 p.AIPlayerEdges.Add(AIEdge);
@@ -222,8 +210,8 @@ public class run : MonoBehaviour {
              
         }
 
-        p.counter1 = 0;
-        p.counter2 = 0;
+        p.counter1 = 0; // resets number of predictions at end of function
+
 		UnityEngine.Debug.Log("Your turn.");
 		this.gameObject.transform.Find ("Buttons").gameObject.SetActive (true);
 		return 0;
@@ -235,13 +223,12 @@ public class run : MonoBehaviour {
 			newEdge.Add(num);
 		} else {
 			newEdge.Add(num);
-//			UnityEngine.Debug.Log ("(" + newEdge [0] + ", " + newEdge[1] + ")");
+
             Edge edgeCheck = new global::run.Edge(newEdge[0], newEdge[1], currentPlayer);
             bool comparison = p.checkIfEdgeExists(edgeCheck);
             if (comparison == true) // if edge exists, have human player restart turn
             {
                 newEdge.Clear();
-//				debug("Edge already exists. Try another move.");
             }
 
             else
@@ -257,9 +244,7 @@ public class run : MonoBehaviour {
 	public void changeTurn(){
 		if (currentPlayer == 1) {
 			currentPlayer = 2;
-			//UnityEngine.Debug.Log ("Changed player to 2");
-			//UnityEngine.Debug.Log ("currentPlayer " + currentPlayer);
-			//UnityEngine.Debug.Log ("isPlayerOneAI " + isPlayerOneAI);
+
 			if (isPlayerOneAI == 0)
 				debug ("Your turn.");
 			else {
@@ -268,9 +253,7 @@ public class run : MonoBehaviour {
 			}
 		} else if(currentPlayer == 2){
 			currentPlayer = 1;
-			//UnityEngine.Debug.Log ("Changed player to 1");
-			//UnityEngine.Debug.Log ("currentPlayer " + currentPlayer);
-			//UnityEngine.Debug.Log ("isPlayerOneAI " + isPlayerOneAI);
+
 			if (isPlayerOneAI == 0) {
 				debug ("AI's turn.");
 				AI ();
@@ -313,6 +296,7 @@ public class run : MonoBehaviour {
 
 
         public Hexagon(int v){
+
 			//Create new lists to keep track of edges
 			vertices = new List<Vertex>();
 			allEdges = new List<Edge>();
@@ -439,7 +423,7 @@ public class run : MonoBehaviour {
 	}
 
 
-	// AI makes a move, determining the best possible choice
+	// determines if the move can be made (i.e. if it already exists or not)
 	public bool legalMove(Edge check)
     {
 
@@ -790,7 +774,7 @@ public class run : MonoBehaviour {
             }
 
 
-
+            // if no moves are available here, we have lost
             if (possibleMoves.Count == 0)
             {
                 UnityEngine.Debug.Log("No moves can be made without losing.");
